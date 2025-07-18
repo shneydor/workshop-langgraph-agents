@@ -17,10 +17,10 @@ def process_input(user_query, uploaded_image):
             # Scenario 2: Only prompt provided → run generation
             input_message = create_prompts(user_query)
 
-        s3_key, message = invoke_agent(input_message)
+        s3_key = invoke_agent(input_message)
         output_path = download_from_s3(s3_bucket, key=s3_key)
 
-        return output_path, message
+        return output_path, ""
 
     except Exception as e:
         return None, f"Error: {str(e)}"
