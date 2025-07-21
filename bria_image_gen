@@ -1,0 +1,61 @@
+@tool
+def get_image_gen(input_query: str, weather: str):
+    """
+    Generate an image based on user query and weather using Bria's API.
+
+    Args:
+        input_query (str): Description of image content.
+        weather (str): Weather info if location mentioned, else "None".
+
+    Returns:
+        str: S3 URI of generated image or error message.
+    """
+    try:
+        # Adjust prompt based on weather
+        if weather == "None":
+            prompt = f"{input_query}"
+        else:
+            prompt = f"{input_query}. Make the clothing suitable for wearing in {weather} weather conditions."
+
+        # Prepare Bria payload
+        payload = {
+            "prompt": prompt,
+            "num_results": 1,
+            "sync": True
+        }
+
+        # API setup
+        api_token = "YOUR_API_KEY_HERE"
+        if not api_token:
+            raise ValueError("Missing 'bria_api_key' in environment variables.")
+        headers = {
+            "Content-Type": "application/json",
+            "api_token": api_token
+        }
+        url = "https://engine.prod.bria-api.com/v1/text-to-image/base/3.1"
+
+        # Request image generation
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        # Get image URL from response
+        image_url = data["result"][0]["urls"][0]
+
+        # Download image content
+        image_response = requests.get(image_url)
+        image_response.raise_for_status()
+        image_data = BytesIO(image_response.content)
+
+        # Upload to S3
+        rand_suffix = randint(0, 1000000)
+        file_name = f"gen_image_{rand_suffix}.jpg"
+        output_key = "OutputImages/" + file_name
+        s3_client.upload_fileobj(image_data, bucket_name, output_key)
+
+        results = f"s3://{bucket_name}/{output_key}"
+
+    except Exception as e:
+        results = f"Image cannot be generated, please try again: see error {e}"
+
+    return results
