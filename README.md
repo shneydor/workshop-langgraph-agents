@@ -77,6 +77,10 @@ app = workflow.compile()
 
 `ai-agents` `langgraph` `langchain` `amazon-bedrock` `aws` `multi-agent-systems` `llm` `generative-ai` `python` `workshop`
 
+## Tips and Tricks
+Resource for Multi-agent with LangGraph: https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/#research-agent
+
+
 ---
 
 **Ready to build the future of AI agents?** Start with the workshop and contact nir.shneydor@automat-it.com to discuss the endless possibilities of LangGraph and Amazon Bedrock integration!
